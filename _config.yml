@@ -27,7 +27,6 @@ url: "https://reece4.github.io/" # the base hostname & protocol for your site, e
 github_username: reece4
 
 # Build settings
-theme: minima
 plugins:
   - jekyll-feed
 
